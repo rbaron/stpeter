@@ -2,42 +2,43 @@
   (:require [aleph.tcp :as tcp]
             [clack.clack :as clack]
             [clojure.core.async :as async]
+            [clojure.data.json :as json]
             [environ.core :refer [env]]
             [manifold.deferred :as d]
             [manifold.stream :as s])
   (:gen-class))
 
-(defn fast-echo-handler
-  [f]
-  (fn [s info]
-    (s/connect
-      (s/map f s)
-      s)))
+(def to-esp (async/chan (async/sliding-buffer 1024)))
 
-(defn print-msg
-  [msg]
-  (println "Got message" (String. msg))
-  (str "ok" \newline))
-
-(def to-esp (s/stream))
-
-(defn send-ack
+(defn handle-msg
   [msg out-chan my-user-id]
-  (if (and (= (:type msg) "message")
-           (not= (:user my-user-id) my-user-id))
-    (async/go (async/>! out-chan {:type "message"
-                                  :channel (:channel msg)
-                                   :text "Ok!"}))))
+  (println "pattern" my-user-id (get msg :text))
+  (if (re-matches (re-pattern (str ".*" my-user-id ".*")) (get msg :text ""))
+    (async/go
+      (async/>! to-esp (:text msg))
+      (async/>! out-chan {:type "message"
+                          :channel (:channel msg)
+                          :text "Ok found my username!"}))))
+
+(defn wait-and-send-to-esp
+  [s info]
+  (async/go-loop []
+    (if-let [msg (async/<! to-esp)]
+      (let [put-res @(s/put! s (str (json/write-str msg) \newline))]
+        (if put-res
+          (recur)
+          (println "Cannot put message to esp (conn probably closed by client)")))
+      (println "Cannot take message from to-esp channel (probably closed)"))))
 
 (defn handler
   [in-chan out-chan config]
   (async/go-loop []
     (if-let [msg (async/<! in-chan)]
-      (do (send-ack msg out-chan (:my-user-id config))
+      (do (handle-msg msg out-chan (:my-user-id config))
           (recur))
       (println "Channel is closed"))))
 
 (defn -main
   [& args]
-  (tcp/start-server (fast-echo-handler print-msg) {:port 10001})
-  @(promise))
+  (tcp/start-server wait-and-send-to-esp {:port 10001})
+  (clack/start (env :slack-api-token) handler))
