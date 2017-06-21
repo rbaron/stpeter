@@ -40,5 +40,5 @@
 
 (defn -main
   [& args]
-  (tcp/start-server wait-and-send-to-esp {:port 10001})
+  (tcp/start-server wait-and-send-to-esp {:port 30669})
   (clack/start (env :slack-api-token) handler))
