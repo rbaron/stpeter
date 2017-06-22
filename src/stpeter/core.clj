@@ -12,7 +12,7 @@
 
 (def help
   (str "Available commands:" \newline
-       "set temp [17-26]" \newline
+       "set temp [18-26]" \newline
        "set ac off"))
 
 (defn make-msg
@@ -28,10 +28,10 @@
         (async/go (async/>! out-chan (make-msg "Ok!" channel))))
     (if-let [[_ temp] (re-find #"^set temp (\d+)$" cmd)]
       (let [int-temp (Integer. temp)]
-        (if (and (>= int-temp 17) (<= int-temp 26))
+        (if (and (>= int-temp 18) (<= int-temp 26))
           (do (async/go (async/>! to-esp cmd))
               (async/go (async/>! out-chan (make-msg "Ok!" channel))))
-          (async/go (async/>! out-chan (make-msg "Invalid temp. Keep it >= 17 and <= 26" channel)))))
+          (async/go (async/>! out-chan (make-msg "Invalid temp. Keep it >= 18 and <= 26" channel)))))
       (async/go (async/>! out-chan (make-msg (str "Invalid command. " help) channel))))))
 
 (defn handle-msg

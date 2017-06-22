@@ -7,10 +7,10 @@
   (testing "It handles valid temp messages"
     (let [out-chan (async/chan)
           my-user-id "my-user-id"]
-      (handle-msg {:text "<@my-user-id> set temp 17" :channel "c"} out-chan my-user-id)
+      (handle-msg {:text "<@my-user-id> set temp 18" :channel "c"} out-chan my-user-id)
       (let [to-esp-msg (async/<!! to-esp)
             to-slack-msg (async/<!! out-chan)]
-        (is (= to-esp-msg "set temp 17"))
+        (is (= to-esp-msg "set temp 18"))
         (is (= to-slack-msg (make-msg "Ok!" "c"))))))
 
   (testing "It handles turn ac off message"
