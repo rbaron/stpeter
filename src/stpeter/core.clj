@@ -14,7 +14,7 @@
   (str ":snowflake: *Exemplos de comandos disponíveis*" \newline
        "set ac1 temp 20" \newline
        "set ac2 off" \newline
-       "PS.: ac1 é o AC perto da janela da fachada )"))
+       "PS.: ac1 é o AC perto da janela da fachada :)"))
 
 (defn make-msg
   [msg channel]
