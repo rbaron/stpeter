@@ -11,7 +11,7 @@
 (def to-esp (async/chan (async/sliding-buffer 1024)))
 
 (def help
-  (str ":snowflake: *Exemplo de comandos disponíveis*" \newline
+  (str ":snowflake: *Exemplos de comandos disponíveis*" \newline
        "set ac1 temp 20" \newline
        "set ac2 off" \newline
        "PS.: ac1 é o AC perto da janela da fachada )"))
