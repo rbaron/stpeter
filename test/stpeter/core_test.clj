@@ -27,14 +27,21 @@
           my-user-id "my-user-id"]
       (handle-msg {:text "<@my-user-id> set ac1 temp 0" :channel "c"} out-chan my-user-id)
       (let [to-slack-msg (async/<!! out-chan)]
-        (is (= to-slack-msg (make-msg "Invalid temp. Keep it >= 18 and <= 26" "c"))))))
+        (is (= to-slack-msg (make-msg "Temperatura inválida. Use 18 <= temp <= 26" "c"))))))
+
+  (testing "It handles invalid huge temp messages"
+    (let [out-chan (async/chan)
+          my-user-id "my-user-id"]
+      (handle-msg {:text "<@my-user-id> set ac1 temp 921371231023701731203123" :channel "c"} out-chan my-user-id)
+      (let [to-slack-msg (async/<!! out-chan)]
+        (is (= to-slack-msg (make-msg "Temperatura inválida. Use 18 <= temp <= 26" "c"))))))
 
   (testing "It handles invalid commands"
     (let [out-chan (async/chan)
           my-user-id "my-user-id"]
       (handle-msg {:text "<@my-user-id> help" :channel "c"} out-chan my-user-id)
       (let [to-slack-msg (async/<!! out-chan)]
-        (is (= to-slack-msg (make-msg (str "Invalid command. " help) "c"))))))
+        (is (= to-slack-msg (make-msg help "c"))))))
 )
 
 (deftest parse-temp-test
