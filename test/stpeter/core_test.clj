@@ -34,5 +34,17 @@
           my-user-id "my-user-id"]
       (handle-msg {:text "<@my-user-id> help" :channel "c"} out-chan my-user-id)
       (let [to-slack-msg (async/<!! out-chan)]
-        (is (= to-slack-msg (make-msg "Invalid command. Available commands:\nset ac[1-2] temp [18-26]\nset ac[1-2] off\nPS.: ac1 is the one closer to the front window" "c"))))))
+        (is (= to-slack-msg (make-msg (str "Invalid command. " help) "c"))))))
+)
+
+(deftest parse-temp-test
+  (testing "It parses temp"
+    (let [tmp (parse-temp "123")]
+      (is (= 123 tmp)))
+  )
+
+  (testing "It doesnt break on huge numbers"
+    (let [tmp (parse-temp "1231203812312730712397120931720938127")]
+      (is (= nil tmp)))
+  )
 )

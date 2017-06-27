@@ -11,10 +11,10 @@
 (def to-esp (async/chan (async/sliding-buffer 1024)))
 
 (def help
-  (str "Available commands:" \newline
-       "set ac[1-2] temp [18-26]" \newline
-       "set ac[1-2] off" \newline
-       "PS.: ac1 is the one closer to the front window"))
+  (str ":snowflake: *Exemplo de comandos disponíveis*" \newline
+       "set ac1 temp 20" \newline
+       "set ac2 off" \newline
+       "PS.: ac1 é o AC perto da janela da fachada )"))
 
 (defn make-msg
   [msg channel]
@@ -24,13 +24,20 @@
 
 ; batta U025DM3H6
 
+(defn parse-temp
+  [str-temp]
+  (try
+    (Integer. str-temp)
+    (catch Exception e
+      nil)))
+
 (defn handle-cmd
   [cmd out-chan channel]
   (if-let [off-cmd (re-find #"^set ac[12] off$" cmd)]
     (do (async/go (async/>! to-esp cmd))
         (async/go (async/>! out-chan (make-msg "Ok!" channel))))
     (if-let [[_ temp] (re-find #"^set ac[12] temp (\d+)$" cmd)]
-      (let [int-temp (Integer. temp)]
+      (if-let [int-temp (parse-temp temp)]
         (if (and (>= int-temp 18) (<= int-temp 26))
           (do (async/go (async/>! to-esp cmd))
               (async/go (async/>! out-chan (make-msg "Ok!" channel))))
