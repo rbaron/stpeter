@@ -12,8 +12,9 @@
 
 (def help
   (str "Available commands:" \newline
-       "set temp [18-26]" \newline
-       "set ac off"))
+       "set ac[1-2] temp [18-26]" \newline
+       "set ac[1-2] off" \newline
+       "PS.: ac1 is the one closer to the front window"))
 
 (defn make-msg
   [msg channel]
@@ -21,12 +22,14 @@
    :text msg
    :channel channel})
 
+; batta U025DM3H6
+
 (defn handle-cmd
   [cmd out-chan channel]
-  (if-let [off-cmd (re-find #"^set ac off$" cmd)]
+  (if-let [off-cmd (re-find #"^set ac[12] off$" cmd)]
     (do (async/go (async/>! to-esp cmd))
         (async/go (async/>! out-chan (make-msg "Ok!" channel))))
-    (if-let [[_ temp] (re-find #"^set temp (\d+)$" cmd)]
+    (if-let [[_ temp] (re-find #"^set ac[12] temp (\d+)$" cmd)]
       (let [int-temp (Integer. temp)]
         (if (and (>= int-temp 18) (<= int-temp 26))
           (do (async/go (async/>! to-esp cmd))
