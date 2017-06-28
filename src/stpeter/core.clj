@@ -59,8 +59,11 @@
     (if-let [msg (async/<! to-esp)]
       (let [put-res @(s/try-put! s (str msg \newline) 3000)]
         (if put-res
-          (do (println "Successfully put message to esp stream" true msg)
-              (recur))
+          (do (println "Successfully put message to esp stream:" true msg)
+              (if-let [res @(s/try-take! s 3000)]
+                (do (println "Got response from esp:" res)
+                    (recur))
+                (println "Couldn't get response from esp")))
           (println "Cannot put message to esp (conn probably closed by client)")))
       (println "Cannot take message from to-esp channel (probably closed)"))))
 
