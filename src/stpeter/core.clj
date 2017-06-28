@@ -63,7 +63,7 @@
               (if-let [res @(s/try-take! s 3000)]
                 (do (println "Got response from esp:" res)
                     (recur))
-                (println "Couldn't get response from esp")))
+                (println "Couldn't get response from esp. Exiting handler.")))
           (println "Cannot put message to esp (conn probably closed by client)")))
       (println "Cannot take message from to-esp channel (probably closed)"))))
 
