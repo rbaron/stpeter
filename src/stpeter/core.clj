@@ -54,6 +54,7 @@
 
 (defn wait-and-send-to-esp
   [s info]
+  (println "Got new connection from esp")
   (async/go-loop []
     (if-let [msg (async/<! to-esp)]
       (let [put-res @(s/try-put! s (str msg \newline) 3000)]
