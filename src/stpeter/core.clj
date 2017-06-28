@@ -56,7 +56,7 @@
   [s info]
   (async/go-loop []
     (if-let [msg (async/<! to-esp)]
-      (let [put-res @(s/put! s (str msg \newline))]
+      (let [put-res @(s/try-put! s (str msg \newline) 3000)]
         (if put-res
           (recur)
           (println "Cannot put message to esp (conn probably closed by client)")))
