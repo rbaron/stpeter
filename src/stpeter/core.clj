@@ -33,16 +33,19 @@
 
 (defn handle-cmd
   [cmd out-chan channel]
-  (if-let [off-cmd (re-find #"^set ac[12] off$" cmd)]
+  (if (re-find #"ping" cmd)
     (do (async/go (async/>! to-esp cmd))
-        (async/go (async/>! out-chan (make-msg "Ok!" channel))))
-    (if-let [[_ temp] (re-find #"^set ac[12] temp (\d+)$" cmd)]
-      (let [int-temp (parse-temp temp)]
-        (if (and int-temp (>= int-temp 18) (<= int-temp 26))
-          (do (async/go (async/>! to-esp cmd))
-              (async/go (async/>! out-chan (make-msg "Ok!" channel))))
-          (async/go (async/>! out-chan (make-msg "Temperatura inválida. Use 18 <= temp <= 26" channel)))))
-      (async/go (async/>! out-chan (make-msg help channel))))))
+        (async/go (async/>! out-chan (make-msg "Sent ping." channel))))
+    (if-let [off-cmd (re-find #"^set ac[12] off$" cmd)]
+      (do (async/go (async/>! to-esp cmd))
+          (async/go (async/>! out-chan (make-msg "Ok!" channel))))
+      (if-let [[_ temp] (re-find #"^set ac[12] temp (\d+)$" cmd)]
+        (let [int-temp (parse-temp temp)]
+          (if (and int-temp (>= int-temp 18) (<= int-temp 26))
+            (do (async/go (async/>! to-esp cmd))
+                (async/go (async/>! out-chan (make-msg "Ok!" channel))))
+            (async/go (async/>! out-chan (make-msg "Temperatura inválida. Use 18 <= temp <= 26" channel)))))
+        (async/go (async/>! out-chan (make-msg help channel)))))))
 
 (defn handle-msg
   [msg out-chan my-user-id]
