@@ -55,17 +55,21 @@
       (if-let [[_ cmd] (re-find matcher)]
         (handle-cmd cmd out-chan (:channel msg)))))
 
+(defn ba-to-str
+  [ba]
+  (apply str (map char ba)))
+
 (defn wait-and-send-to-esp
   [s info]
   (println "Got new connection from esp")
   (async/go-loop []
-    (let [from-ch (async/alts! [to-esp (async/timeout 10000)])
+    (let [[from-ch ch] (async/alts! [to-esp (async/timeout 10000)])
           msg (or from-ch "ping")]
       (let [put-res @(s/try-put! s (str msg \newline) 3000)]
         (if put-res
           (do (println "Successfully put message to esp stream:" true msg)
               (if-let [res @(s/try-take! s 3000)]
-                (do (println "Got response from esp:" res)
+                (do (println "Got response from esp:" (ba-to-str res))
                     (recur))
                 (println "Couldn't get response from esp. Exiting handler.")))
           (println "Cannot put message to esp (conn probably closed by client)"))))))
