@@ -8,7 +8,7 @@
             [manifold.stream :as s])
   (:gen-class))
 
-(def to-esp (async/chan (async/sliding-buffer 1024)))
+(def to-esp (async/chan (async/sliding-buffer 1)))
 
 (def help
   (str ":snowflake: *Exemplos de comandos disponíveis*" \newline
@@ -16,13 +16,20 @@
        "set ac2 off" \newline
        "PS.: ac1 é o AC perto da janela da fachada :)"))
 
-(defn make-msg
-  [msg channel]
-  {:type "message"
-   :text msg
-   :channel channel})
+(def batta-uid "U025DM3H6")
+(def baron-uid "U0SKTLH28")
 
-; batta U025DM3H6
+(defn ack
+  [base user]
+  (cond (= batta-uid user) (str ":middle-finger: :middle-finger: :middle-finger:")
+        (= baron-uid user) (str ":+1:" \newline base)
+        :else base))
+
+(defn make-msg
+  [msg channel user]
+  {:type "message"
+   :text (ack msg user)
+   :channel channel})
 
 (defn parse-temp
   [str-temp]
@@ -32,20 +39,20 @@
       nil)))
 
 (defn handle-cmd
-  [cmd out-chan channel]
+  [cmd out-chan channel user]
   (if (re-find #"ping" cmd)
     (do (async/go (async/>! to-esp cmd))
-        (async/go (async/>! out-chan (make-msg "Sent ping." channel))))
+        (async/go (async/>! out-chan (make-msg "Sent ping." channel user))))
     (if-let [off-cmd (re-find #"^set ac[12] off$" cmd)]
       (do (async/go (async/>! to-esp cmd))
-          (async/go (async/>! out-chan (make-msg "Ok!" channel))))
+          (async/go (async/>! out-chan (make-msg "Ok!" channel user))))
       (if-let [[_ temp] (re-find #"^set ac[12] temp (\d+)$" cmd)]
         (let [int-temp (parse-temp temp)]
           (if (and int-temp (>= int-temp 18) (<= int-temp 26))
             (do (async/go (async/>! to-esp cmd))
-                (async/go (async/>! out-chan (make-msg "Ok!" channel))))
-            (async/go (async/>! out-chan (make-msg "Temperatura inválida. Use 18 <= temp <= 26" channel)))))
-        (async/go (async/>! out-chan (make-msg help channel)))))))
+                (async/go (async/>! out-chan (make-msg "Ok!" channel user))))
+            (async/go (async/>! out-chan (make-msg "Temperatura inválida. Use 18 <= temp <= 26" channel user)))))
+        (async/go (async/>! out-chan (make-msg help channel user)))))))
 
 (defn handle-msg
   [msg out-chan my-user-id]
@@ -53,7 +60,7 @@
         pattern (re-pattern (str "<@" my-user-id "> (.*)"))
         matcher (re-matcher pattern text)]
       (if-let [[_ cmd] (re-find matcher)]
-        (handle-cmd cmd out-chan (:channel msg)))))
+        (handle-cmd cmd out-chan (:channel msg) (get msg :user "")))))
 
 (defn ba-to-str
   [ba]
