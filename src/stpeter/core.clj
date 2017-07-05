@@ -19,10 +19,13 @@
 (def batta-uid "U025DM3H6")
 (def baron-uid "U0SKTLH28")
 
+(def middle-finger
+  (str ":middle_finger: :middle_finger: :middle_finger:"))
+
 (defn ack
   [base user]
-  (cond (= batta-uid user) (str ":middle-finger: :middle-finger: :middle-finger:")
-        (= baron-uid user) (str ":+1:" \newline base)
+  (cond (= batta-uid user) middle-finger
+        (= baron-uid user) middle-finger
         :else base))
 
 (defn make-msg

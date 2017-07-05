@@ -49,7 +49,7 @@
       (handle-msg {:text "<@my-user-id> help" :channel "c" :user "U025DM3H6"} out-chan my-user-id)
       (let [to-slack-msg (async/<!! out-chan)]
         (is (= to-slack-msg {:type "message"
-                             :text ":middle-finger: :middle-finger: :middle-finger:"
+                             :text ":middle_finger: :middle_finger: :middle_finger:"
                              :channel "c"})))))
 )
 
