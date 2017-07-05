@@ -25,7 +25,7 @@
 (defn ack
   [base user]
   (cond (= batta-uid user) middle-finger
-        (= baron-uid user) middle-finger
+        (= baron-uid user) base
         :else base))
 
 (defn make-msg
