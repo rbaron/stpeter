@@ -43,6 +43,7 @@
       (let [to-slack-msg (async/<!! out-chan)]
         (is (= to-slack-msg (make-msg help "c" "user"))))))
 
+  ; Please ignore this. It's a joke I pulled on a coworker!
   (testing "It responds to batta"
     (let [out-chan (async/chan)
           my-user-id "my-user-id"]

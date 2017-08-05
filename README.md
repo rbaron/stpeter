@@ -1,36 +1,17 @@
 # stpeter
 
-FIXME: description
+This is part of the toy system built for controlling our office's air conditioner units via Slack. This repo contains the server application, which connects to Slack and also listens for connections from the ESP8266 board.
 
-## Installation
+For more informations on this project, check out [this blog](http://rbaron.net/blog).
 
-Download from http://example.com/FIXME.
+## Running
 
-## Usage
+```bash
+$ SLACK_API_TOKEN=__MY_SLACK_API_TOKEN__ lein run
+```
 
-FIXME: explanation
-
-    $ java -jar stpeter-0.1.0-standalone.jar [args]
-
-## Options
-
-FIXME: listing of options this app accepts.
-
-## Examples
-
-...
-
-### Bugs
-
-...
-
-### Any Other Sections
-### That You Think
-### Might be Useful
+or use the `lein uberjar` command and run the resulting .jar file.
 
 ## License
 
-Copyright © 2017 FIXME
-
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+MIT

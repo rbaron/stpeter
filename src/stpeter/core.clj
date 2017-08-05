@@ -16,9 +16,9 @@
        "set ac2 off" \newline
        "PS.: ac1 é o AC perto da janela da fachada :)"))
 
+; Please ignore this. It's simply a joke I pulled on a coworker!
 (def batta-uid "U025DM3H6")
 (def baron-uid "U0SKTLH28")
-
 (def middle-finger
   (str ":middle_finger: :middle_finger: :middle_finger:"))
 
